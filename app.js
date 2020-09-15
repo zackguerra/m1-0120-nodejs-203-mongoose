@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
+// const path = require('path');
+const mongoose = require('mongoose');
 
+require('dotenv').config();
 const app = express();
 const shopRoute = require('./routes/shop.route');
 const adminRoute = require('./routes/admin.route');
-const mongoConnect = require('./util/database').mongoConnect;
+// const mongoConnect = require('./util/database').mongoConnect;
 const errorController = require('./controllers/error.controller');
 
 const User = require('./models/user.model');
@@ -32,7 +34,7 @@ app.use((req,res,next) => {
     //         next();
     //     })
     //     .catch(err => console.log(err));
-    User.findById('5f5fb438230cc508758033f0')
+    User.findById('5f6106ff2308822e64b00303')
         .then(user => {
             req.user = user;
             next();
@@ -52,6 +54,32 @@ app.use(errorController.get404);
 
 //set up the port 
 const PORT = process.env.PORT || 8000;
-mongoConnect(() =>  {
-    app.listen(PORT, ()=> console.log(`Server started at port ${PORT}.`))
-})
+
+    mongoose
+        .connect(process.env.MONGODB_URL,{
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        })
+        .then(()=>{
+            console.log('Connected to Database!');
+            app.listen(PORT, ()=> console.log(`Server started at port ${PORT},`))
+
+            User.findOne().then((user)=>{
+                if(!user){
+                    const user = new User({
+                        name: 'Zack',
+                        email: 'zack@minipixel.ca',
+                        cart: {
+                            items: []
+                        }
+                    });
+                    user.save();
+                }
+            });            
+        })
+        .catch(err=> console.log(err))
+
+
+// mongoConnect(() =>  {
+//     app.listen(PORT, ()=> console.log(`Server started at port ${PORT}.`))
+// })
