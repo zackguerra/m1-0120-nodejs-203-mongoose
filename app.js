@@ -1,9 +1,15 @@
+//git clone https://github.com/andasan/m1-0120-nodejs-203-mongoose.git 
+//after cloning....
+//git remote -v //to check the origin's url
+//git remote remove origin
+//git remote add origin <your_url>
+
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 // const path = require('path');
 const mongoose = require('mongoose');
 
-require('dotenv').config();
 const app = express();
 const shopRoute = require('./routes/shop.route');
 const adminRoute = require('./routes/admin.route');
@@ -27,14 +33,7 @@ app.use('/public', express.static('public'));
 
 //dummy auth flow ----storing a reference of a user
 app.use((req,res,next) => {
-    // const user = new User('admin', 'admin@mail.com');
-    // user.save()
-    //     .then((result) => {
-    //         console.log(result)
-    //         next();
-    //     })
-    //     .catch(err => console.log(err));
-    User.findById('5f6106ff2308822e64b00303')
+    User.findById('5f610976005db1074aba6607')
         .then(user => {
             req.user = user;
             next();
@@ -55,31 +54,30 @@ app.use(errorController.get404);
 //set up the port 
 const PORT = process.env.PORT || 8000;
 
-    mongoose
-        .connect(process.env.MONGODB_URL,{
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
-        .then(()=>{
-            console.log('Connected to Database!');
-            app.listen(PORT, ()=> console.log(`Server started at port ${PORT},`))
+mongoose
+    .connect(process.env.MONGODB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => {
+        console.log('Connected to Database!');
+        app.listen(PORT, ()=> console.log(`Server started at port ${PORT}.`));
 
-            User.findOne().then((user)=>{
-                if(!user){
-                    const user = new User({
-                        name: 'Zack',
-                        email: 'zack@minipixel.ca',
-                        cart: {
-                            items: []
-                        }
-                    });
-                    user.save();
-                }
-            });            
-        })
-        .catch(err=> console.log(err))
-
+        //not necessary for production, just to create a a user to get an id for dummy auth
+        User.findOne().then((user)=> {
+            if(!user){
+                const user = new User({
+                    name: 'admin',
+                    email: 'admin@mail.com',
+                    cart: {
+                        items: []
+                    }
+                });
+                user.save();
+            }
+        });
+    })
+    .catch(err => console.log(err))
 
 // mongoConnect(() =>  {
-//     app.listen(PORT, ()=> console.log(`Server started at port ${PORT}.`))
 // })

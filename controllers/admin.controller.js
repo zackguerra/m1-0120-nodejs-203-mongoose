@@ -15,19 +15,19 @@ exports.postAddProduct = (req,res,next) => {
     const description = req.body.description;
     const price = req.body.price;
     const product = new Product({
-        title: title,
-        imageUrl: imageUrl,
-        description: description,
+        title: title, 
+        imageUrl: imageUrl, 
+        description: description, 
         price: price,
         userId: req.user //mongoose will pick the id from the user object of request
     });
     product
         .save()
-        .then(()=>{
+        .then(() => {
             console.log('Created Product');
             res.redirect('/');
         })
-        .catch(err=> console.log(err));
+        .catch(err => console.log(err));
 };
 
 exports.getEditProduct = (req,res,next) => {
@@ -57,31 +57,32 @@ exports.postEditProduct = (req,res,next) => {
     const updatedPrice = req.body.price;
     // const updateProduct = new Product(prodId, updatedTitle, updatedImageUrl, updatedDesc, updatedPrice);
     Product
-    .findById(prodId)
-    .then((product) =>{
-        product.title = updatedTitle,
-        product.imageUrl = updatedImageUrl,
-        product.description = updatedDesc,
-        product.price = updatedPrice
-        return product.save();
-    })
-    .then(()=>{
-        console.log('Updated Product');
-        res.redirect('/admin/products');
-    })
+        .findById(prodId)
+        .then((product) => {
+            product.title = updatedTitle,
+            product.imageUrl = updatedImageUrl,
+            product.description = updatedDesc,
+            product.price = updatedPrice
+            return product.save();
+        })
+        .then(() => {
+            console.log('Updated Product');
+            res.redirect('/admin/products');
+        })
         .catch(err => console.log(err));
-    
-    // updateProduct.edit(prodId)
-    // .then(()=>{
-    //     res.redirect('/admin/products');
-    // })
-    // .catch(err=> console.log(err));
+
+    // updateProduct.edit(prodId) 
+    //     .then(()=>{
+    //         res.redirect('/admin/products');
+    //     })
+    //     .catch(err => console.log(err));
 };
 
 exports.getProducts = (req,res,next) => {
-    console.log(req.user);
     Product.find()
+        // .populate('userId', 'name')
         .then((products) => {
+            // console.log(products);
             res.render('admin/products', {
                 pageTitle: 'Admin Products',
                 path: '/admin/products',
@@ -94,10 +95,10 @@ exports.getProducts = (req,res,next) => {
 exports.postDeleteProduct = (req,res,next) => {
     const prodId = req.body.productId;
     Product
-    .findByIdAndRemove(prodId)
-    .then(()=>{
-        console.log('Deleted Product');
-        res.redirect('/admin/products');
-    })
-    .catch(err=> console.log(err));
+        .findByIdAndRemove(prodId)
+        .then(() => {
+            console.log('Deleted Product');
+            res.redirect('/admin/products');
+        })
+        .catch(err => console.log(err));
 }
